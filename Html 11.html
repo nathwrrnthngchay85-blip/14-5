@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galaxy Flashcards — คำศัพท์จีน</title>
+<style>
+  :root{
+    --neon:#8be9ff; --purple:#a06bff; --pink:#ff6ad5;
+    --ok:#3ef0a8; --no:#ff5f7e;
+    --glass:rgba(255,255,255,.07); --stroke:rgba(255,255,255,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Noto Sans Thai","Segoe UI",system-ui,-apple-system,sans-serif;
+    background:radial-gradient(ellipse at 50% 0%,#140b33 0%,#05030f 60%);
+    color:#eaf2ff;overflow-x:hidden;min-height:100vh;
+  }
+  #sky,#dust,.nebula{position:fixed;z-index:-1;pointer-events:none}
+  #sky,#dust{inset:0;display:block}
+  .nebula{border-radius:50%;filter:blur(90px);opacity:.5;mix-blend-mode:screen}
+  .n1{width:520px;height:520px;left:-120px;top:-100px;
+      background:radial-gradient(circle,#7b2dff,transparent 65%);animation:drift1 24s ease-in-out infinite}
+  .n2{width:620px;height:620px;right:-170px;top:18%;
+      background:radial-gradient(circle,#ff3ea5,transparent 65%);animation:drift2 30s ease-in-out infinite}
+  .n3{width:500px;height:500px;left:28%;bottom:-200px;
+      background:radial-gradient(circle,#00d4ff,transparent 65%);animation:drift3 27s ease-in-out infinite}
+  @keyframes drift1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(90px,70px) scale(1.18)}}
+  @keyframes drift2{0%,100%{transform:translate(0,0) scale(1.1)}50%{transform:translate(-110px,60px) scale(.9)}}
+  @keyframes drift3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(70px,-80px) scale(1.2)}}
+
+  .wrap{position:relative;z-index:1;width:100%;max-width:820px;margin:0 auto;padding:22px 16px 60px}
+  #err{display:none;background:#5b1020;border:1px solid #ff5f7e;color:#ffd9e0;
+       padding:10px 14px;border-radius:12px;font-size:13px;margin-bottom:12px;white-space:pre-wrap}
+  header{text-align:center;margin-bottom:16px}
+  h1{font-size:clamp(22px,5vw,34px);font-weight:800;letter-spacing:.5px;
+     background:linear-gradient(92deg,var(--neon),var(--purple),var(--pink),var(--neon));
+     background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+     animation:shine 7s linear infinite}
+  @keyframes shine{to{background-position:300% 0}}
+  .sub{font-size:13px;color:#9fb0d8;margin-top:6px}
+
+  .bar{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:14px 0}
+  .btn{border:1px solid var(--stroke);background:var(--glass);color:#dfe9ff;
+       padding:9px 15px;border-radius:999px;font-size:13px;cursor:pointer;transition:.25s;font-family:inherit}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 0 18px rgba(139,233,255,.35);border-color:var(--neon)}
+  select{border:1px solid var(--stroke);background:rgba(10,8,28,.9);color:#dfe9ff;
+         padding:9px 12px;border-radius:999px;font-size:13px;font-family:inherit;outline:none;cursor:pointer}
+
+  .stats{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .pill{background:var(--glass);border:1px solid var(--stroke);border-radius:14px;padding:7px 14px;font-size:12.5px}
+  .pill b{font-size:15px}
+  .ok b{color:var(--ok)} .no b{color:var(--no)} .left b{color:var(--neon)}
+  .progress{height:7px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin:12px 4px 22px}
+  .progress i{display:block;height:100%;width:0%;border-radius:99px;transition:width .45s ease;
+     background:linear-gradient(90deg,var(--neon),var(--purple),var(--pink));
+     box-shadow:0 0 14px rgba(160,107,255,.8)}
+
+  /* ===== โครงการ์ด: แยกชั้นแอนิเมชันออกจากชั้นหมุน ===== */
+  .stage{perspective:1600px;display:flex;justify-content:center;min-height:360px}
+  .cardWrap{width:min(100%,460px);height:340px;transform-style:preserve-3d}
+  .card{width:100%;height:100%;position:relative;transform-style:preserve-3d;cursor:pointer;
+        transition:transform .7s cubic-bezier(.3,1.3,.4,1)}
+  .card.flip{transform:rotateY(180deg)}
+  .card.noanim{transition:none}
+
+  .face{position:absolute;inset:0;border-radius:26px;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+    padding:28px;text-align:center;border:1px solid var(--stroke);
+    background:linear-gradient(150deg,rgba(44,24,96,.96),rgba(9,9,38,.98));
+    box-shadow:0 18px 48px rgba(0,0,0,.6), inset 0 0 50px rgba(120,80,255,.2);
+    overflow:hidden}
+  .front{transform:translateZ(1px)}
+  .back{transform:rotateY(180deg) translateZ(1px)}
+  .face::before{content:"";position:absolute;inset:-2px;border-radius:28px;padding:1.5px;
+    background:linear-gradient(130deg,var(--neon),var(--purple),var(--pink),var(--neon));
+    background-size:300% 300%;animation:shine 6s linear infinite;
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;opacity:.75;pointer-events:none}
+  .tag{position:absolute;top:14px;left:16px;font-size:11px;letter-spacing:1px;color:#b9a7ff;
+       border:1px solid rgba(160,107,255,.5);padding:3px 10px;border-radius:99px}
+  .idx{position:absolute;top:14px;right:16px;font-size:11px;color:#8fa3cf}
+  .hanzi{font-size:clamp(54px,15vw,92px);line-height:1.15;font-weight:600;
+    font-family:"Noto Serif SC","Songti SC","Microsoft YaHei",serif;
+    text-shadow:0 0 26px rgba(139,233,255,.55),0 0 60px rgba(160,107,255,.4)}
+  .pinyin{font-size:clamp(20px,5vw,28px);color:var(--neon);letter-spacing:1px}
+  .th{font-size:clamp(15px,3.8vw,19px);color:#e7ddff;line-height:1.6;max-width:92%}
+  .hint{position:absolute;bottom:14px;font-size:11.5px;color:#7f8fba}
+  .speak{position:absolute;bottom:12px;right:16px;border:1px solid var(--stroke);
+    background:rgba(255,255,255,.08);color:#cfe3ff;border-radius:50%;
+    width:34px;height:34px;font-size:15px;cursor:pointer;transition:.2s}
+  .speak:hover{box-shadow:0 0 14px var(--neon);border-color:var(--neon)}
+
+  /* แอนิเมชันอยู่ที่ cardWrap เท่านั้น → ไม่ทับ rotateY ของ .card */
+  @keyframes inRight{from{opacity:0;transform:translateX(60px) scale(.92)}to{opacity:1;transform:translateX(0) scale(1)}}
+  @keyframes outOK{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(420px) rotate(14deg) scale(.7)}}
+  @keyframes outNO{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-420px) rotate(-14deg) scale(.7)}}
+  .cardWrap.enter{animation:inRight .45s ease both}
+  .cardWrap.leaveOK{animation:outOK .45s ease forwards;filter:drop-shadow(0 0 26px var(--ok))}
+  .cardWrap.leaveNO{animation:outNO .45s ease forwards;filter:drop-shadow(0 0 26px var(--no))}
+
+  .answers{display:flex;gap:14px;justify-content:center;margin-top:22px;flex-wrap:wrap}
+  .ans{flex:1;min-width:140px;max-width:200px;padding:14px 10px;border-radius:18px;font-size:15px;
+       font-weight:700;cursor:pointer;border:1px solid var(--stroke);font-family:inherit;transition:.25s;color:#fff}
+  .ansNo{background:linear-gradient(140deg,rgba(255,95,126,.3),rgba(120,20,60,.4))}
+  .ansOk{background:linear-gradient(140deg,rgba(62,240,168,.28),rgba(10,100,90,.4))}
+  .ansFlip{background:linear-gradient(140deg,rgba(139,233,255,.25),rgba(160,107,255,.35))}
+  .ansNo:hover{box-shadow:0 0 22px rgba(255,95,126,.6);transform:translateY(-3px)}
+  .ansOk:hover{box-shadow:0 0 22px rgba(62,240,168,.6);transform:translateY(-3px)}
+  .ansFlip:hover{box-shadow:0 0 22px rgba(139,233,255,.6);transform:translateY(-3px)}
+
+  .done{display:none;text-align:center;padding:34px 22px;border-radius:26px;
+        border:1px solid var(--stroke);background:rgba(20,14,52,.85)}
+  .done h2{font-size:26px;margin-bottom:10px;color:var(--neon)}
+  .done p{color:#c3cfeb;font-size:14.5px;line-height:1.8;margin-bottom:16px}
+  @media(max-width:480px){.cardWrap{height:310px}}
+</style>
+</head>
+<body>
+
+<canvas id="sky"></canvas>
+<canvas id="dust"></canvas>
+<div class="nebula n1"></div><div class="nebula n2"></div><div class="nebula n3"></div>
+
+<div class="wrap">
+  <div id="err"></div>
+  <header>
+    <h1>✦ Galaxy Flashcards ✦</h1>
+    <div class="sub">แตะการ์ดหรือกด Space เพื่อพลิก · → จำได้ · ← จำไม่ได้ · S สุ่ม · M สลับโหมด</div>
+  </header>
+
+  <div class="bar">
+    <button class="btn" id="modeBtn" type="button">โหมด: 中文 ➜ พินอิน/แปล</button>
+    <select id="filter"></select>
+    <button class="btn" id="shuffleBtn" type="button">สุ่มไพ่</button>
+    <button class="btn" id="resetBtn" type="button">เริ่มใหม่</button>
+  </div>
+
+  <div class="stats">
+    <div class="pill left">เหลือ <b id="sLeft">0</b></div>
+    <div class="pill ok">จำได้ <b id="sOk">0</b></div>
+    <div class="pill no">จำไม่ได้ <b id="sNo">0</b></div>
+    <div class="pill">รอบ <b id="sRound">1</b></div>
+  </div>
+  <div class="progress"><i id="bar"></i></div>
+
+  <div class="stage" id="stage">
+    <div class="cardWrap" id="cardWrap">
+      <div class="card" id="card">
+        <div class="face front">
+          <span class="tag" id="tagF">—</span><span class="idx" id="idxF"></span>
+          <div id="frontBody"></div>
+          <div class="hint">แตะเพื่อดูเฉลย</div>
+        </div>
+        <div class="face back">
+          <span class="tag">เฉลย</span><span class="idx" id="idxB"></span>
+          <div id="backBody"></div>
+          <button class="speak" id="speakBtn" type="button" title="ออกเสียง">🔊</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="answers" id="answers">
+    <button class="ans ansNo" id="btnNo" type="button">✗ จำไม่ได้</button>
+    <button class="ans ansFlip" id="btnFlip" type="button">⟳ พลิกการ์ด</button>
+    <button class="ans ansOk" id="btnOk" type="button">✓ จำได้</button>
+  </div>
+
+  <div class="done" id="done">
+    <h2>🌌 จบรอบแล้ว!</h2>
+    <p id="doneText"></p>
+    <button class="btn" id="againWrong" type="button">ทบทวนเฉพาะที่จำไม่ได้</button>
+    <button class="btn" id="againAll" type="button">เริ่มทั้งหมดใหม่</button>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+try{
+
+var mem={};
+var store={
+  get:function(k,d){ try{ var v=localStorage.getItem(k); return v===null?(k in mem?mem[k]:d):v; }
+                     catch(e){ return (k in mem)?mem[k]:d; } },
+  set:function(k,v){ mem[k]=v; try{ localStorage.setItem(k,v); }catch(e){} }
+};
+
+var DATA=[
+  {head:"傍", hz:"傍晚", py:"bàngwǎn", th:"ตอนเย็น, พลบค่ำ, ยามเย็น"},
+  {head:"催", hz:"催",   py:"cuī",      th:"เร่ง, เร่งรัด, กระตุ้น"},
+  {head:"傻", hz:"傻",   py:"shǎ",      th:"โง่, เซ่อ, ทึ่ม"},
+  {head:"此", hz:"此外", py:"cǐwài",    th:"นอกจากนี้"},
+  {head:"此", hz:"从此", py:"cóngcǐ",   th:"ตั้งแต่นั้นเป็นต้นมา, ตั้งแต่นี้ไป"},
+  {head:"此", hz:"特此", py:"tècǐ",     th:"จึงเรียนมาเพื่อ... (ใช้ในหนังสือราชการ เช่น 特此通知 จึงเรียนมาเพื่อทราบ)"},
+  {head:"此", hz:"因此", py:"yīncǐ",    th:"ดังนั้น, ด้วยเหตุนี้"},
+  {head:"此", hz:"彼此", py:"bǐcǐ",     th:"ซึ่งกันและกัน, ฝ่ายนั้นฝ่ายนี้"},
+  {head:"此", hz:"此刻", py:"cǐkè",     th:"ตอนนี้, ขณะนี้"},
+  {head:"此", hz:"如此", py:"rúcǐ",     th:"เช่นนี้, แบบนี้"},
+  {head:"允", hz:"允许", py:"yǔnxǔ",    th:"อนุญาต, ยินยอม"},
+  {head:"兄", hz:"兄弟", py:"xiōngdì",  th:"พี่น้อง (ชาย)"},
+  {head:"兄", hz:"弟兄", py:"dìxiong",  th:"พี่น้อง (มักใช้เรียกมิตรสหายร่วมรบ หรือพี่น้องในทางศาสนาคริสต์)"},
+  {head:"充", hz:"补充", py:"bǔchōng",  th:"เสริม, เพิ่มเติม"},
+  {head:"充", hz:"充分", py:"chōngfèn", th:"อย่างเพียงพอ, อย่างเต็มที่"},
+  {head:"充", hz:"充满", py:"chōngmǎn", th:"เต็มไปด้วย (นามธรรมหรือรูปธรรม)"},
+  {head:"充", hz:"充足", py:"chōngzú",  th:"เพียงพอ, อุดมสมบูรณ์"},
+  {head:"充", hz:"充实", py:"chōngshí", th:"มีสาระ, ทำให้สมบูรณ์, เติมเต็มความรู้/ประสบการณ์"},
+  {head:"党", hz:"党员", py:"dǎngyuán", th:"สมาชิกพรรค"},
+  {head:"党", hz:"共产党", py:"gòngchǎndǎng", th:"พรรคคอมมิวนิสต์"},
+  {head:"党", hz:"国民党", py:"guómíndǎng",   th:"พรรคก๊กมินตั๋ง (พรรคชาตินิยมของจีน)"},
+  {head:"党", hz:"党派", py:"dǎngpài",  th:"พรรคการเมือง, ฝักฝ่าย"},
+  {head:"竟", hz:"究竟", py:"jiūjìng",  th:"ตกลงว่า...กันแน่ (ใช้เน้นในประโยคคำถาม), ท้ายที่สุด"},
+  {head:"竟", hz:"毕竟", py:"bìjìng",   th:"ท้ายที่สุดแล้ว, ถึงอย่างไร...ก็..."},
+  {head:"竟", hz:"竟然", py:"jìngrán",  th:"คาดไม่ถึงว่า, ...เสียด้วยซ้ำ, กลับ..."},
+  {head:"背", hz:"背后", py:"bèihòu",   th:"เบื้องหลัง, ลับหลัง, ด้านหลัง"},
+  {head:"背", hz:"背包", py:"bēibāo",   th:"กระเป๋าเป้, กระเป๋าสะพายหลัง"},
+  {head:"背", hz:"背景", py:"bèijǐng",  th:"ภูมิหลัง, ฉากหลัง, เบื้องหลัง (เช่น ประวัติครอบครัวหรือการศึกษา)"}
+];
+
+var $=function(id){return document.getElementById(id);};
+var deck=[],cur=0,okList=[],noList=[],round=1,busy=false;
+var mode=store.get('gf_mode','zh');
+var filterHead=store.get('gf_filter','ALL');
+
+var heads=[];
+DATA.forEach(function(d){ if(heads.indexOf(d.head)<0) heads.push(d.head); });
+if(filterHead!=='ALL' && heads.indexOf(filterHead)<0) filterHead='ALL';
+$('filter').innerHTML='<option value="ALL">ทุกหมวด ('+DATA.length+' คำ)</option>'+
+  heads.map(function(h){
+    var n=DATA.filter(function(d){return d.head===h;}).length;
+    return '<option value="'+h+'">'+h+' ('+n+')</option>';
+  }).join('');
+$('filter').value=filterHead;
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=(Math.random()*(i+1))|0,t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+/* ---- ฟังก์ชันพลิก: จุดเดียวที่ควบคุมทุกทาง ---- */
+function flip(){
+  if(busy || !deck[cur]) return;
+  $('card').classList.toggle('flip');
+}
+
+function start(list){
+  var src=list?list.slice():DATA.filter(function(d){return filterHead==='ALL'||d.head===filterHead;});
+  deck=shuffle(src); cur=0; okList=[]; noList=[]; busy=false;
+  $('done').style.display='none';
+  $('stage').style.display='flex';
+  $('answers').style.display='flex';
+  render(); update();
+}
+
+function render(){
+  var c=deck[cur];
+  if(!c){ finish(); return; }
+  var card=$('card'), wrap=$('cardWrap');
+
+  /* รีเซ็ตหน้าการ์ดแบบไม่มีทรานซิชัน (กันเห็นการ์ดหมุนกลับ) */
+  card.classList.add('noanim');
+  card.classList.remove('flip');
+  void card.offsetWidth;
+  card.classList.remove('noanim');
+
+  var zh ='<div class="hanzi">'+c.hz+'</div>';
+  var pin='<div class="pinyin">'+c.py+'</div><div class="th">'+c.th+'</div>';
+  $('frontBody').innerHTML=(mode==='zh')?zh:pin;
+  $('backBody').innerHTML =(mode==='zh')?pin:zh;
+  $('tagF').textContent='หมวด '+c.head;
+  $('idxF').textContent=$('idxB').textContent=(cur+1)+'/'+deck.length;
+
+  wrap.classList.remove('enter'); void wrap.offsetWidth; wrap.classList.add('enter');
+}
+
+function update(){
+  $('sLeft').textContent=Math.max(deck.length-cur,0);
+  $('sOk').textContent=okList.length;
+  $('sNo').textContent=noList.length;
+  $('sRound').textContent=round;
+  $('bar').style.width=(deck.length?(cur/deck.length*100):0)+'%';
+}
+
+function answer(good){
+  if(busy||!deck[cur]) return;
+  busy=true;
+  (good?okList:noList).push(deck[cur]);
+  var wrap=$('cardWrap');
+  wrap.classList.remove('enter');
+  wrap.classList.add(good?'leaveOK':'leaveNO');
+  burst(good);
+  setTimeout(function(){
+    wrap.classList.remove('leaveOK','leaveNO');
+    cur++; update();
+    busy=false;
+    if(cur>=deck.length) finish(); else render();
+  },450);
+}
+
+function finish(){
+  $('stage').style.display='none';
+  $('answers').style.display='none';
+  $('done').style.display='block';
+  var total=okList.length+noList.length;
+  var pct=total?Math.round(okList.length/total*100):0;
+  $('doneText').innerHTML='จำได้ <b style="color:var(--ok)">'+okList.length+'</b> คำ · '+
+    'จำไม่ได้ <b style="color:var(--no)">'+noList.length+'</b> คำ<br>'+
+    'ความแม่นยำ <b style="color:var(--neon)">'+pct+'%</b>';
+  $('againWrong').style.display=noList.length?'inline-block':'none';
+  $('bar').style.width='100%';
+}
+
+/* =================== อีเวนต์ =================== */
+$('card').addEventListener('click',function(e){
+  if(e.target && e.target.id==='speakBtn') return;
+  flip();
+});
+$('btnFlip').addEventListener('click',flip);
+$('speakBtn').addEventListener('click',function(e){
+  e.stopPropagation();
+  var c=deck[cur];
+  if(!c||!('speechSynthesis' in window)) return;
+  try{ var u=new SpeechSynthesisUtterance(c.hz); u.lang='zh-CN'; u.rate=.85;
+       speechSynthesis.cancel(); speechSynthesis.speak(u); }catch(err){}
+});
+$('btnOk').addEventListener('click',function(){answer(true);});
+$('btnNo').addEventListener('click',function(){answer(false);});
+$('modeBtn').addEventListener('click',function(){
+  mode=(mode==='zh')?'pin':'zh'; store.set('gf_mode',mode); setModeLabel(); render();
+});
+$('shuffleBtn').addEventListener('click',function(){
+  if(!deck.length) return;
+  deck=shuffle(deck.slice(cur)); cur=0; render(); update();
+});
+$('resetBtn').addEventListener('click',function(){ round=1; start(); });
+$('filter').addEventListener('change',function(e){
+  filterHead=e.target.value; store.set('gf_filter',filterHead); round=1; start();
+});
+$('againWrong').addEventListener('click',function(){ round++; start(noList); });
+$('againAll').addEventListener('click',function(){ round=1; start(); });
+
+document.addEventListener('keydown',function(e){
+  var tag=(e.target&&e.target.tagName)||'';
+  if(tag==='SELECT'||tag==='INPUT') return;
+  if(e.code==='Space'||e.key===' '){ e.preventDefault(); flip(); }
+  else if(e.key==='ArrowRight') answer(true);
+  else if(e.key==='ArrowLeft') answer(false);
+  else if(e.key&&e.key.toLowerCase()==='s') $('shuffleBtn').click();
+  else if(e.key&&e.key.toLowerCase()==='m') $('modeBtn').click();
+});
+
+var sx=0,sy=0,moved=false,st=$('stage');
+st.addEventListener('touchstart',function(e){ sx=e.touches[0].clientX; sy=e.touches[0].clientY; moved=false; },{passive:true});
+st.addEventListener('touchmove',function(){ moved=true; },{passive:true});
+st.addEventListener('touchend',function(e){
+  if(!moved) return;
+  var dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
+  if(Math.abs(dx)<Math.abs(dy)) return;
+  if(dx>70) answer(true); else if(dx<-70) answer(false);
+},{passive:true});
+
+function setModeLabel(){
+  $('modeBtn').textContent='โหมด: '+(mode==='zh'?'中文 ➜ พินอิน/แปล':'พินอิน/แปล ➜ 中文');
+}
+
+function burst(good){
+  var r=$('card').getBoundingClientRect(), col=good?'#3ef0a8':'#ff5f7e';
+  for(var i=0;i<24;i++){
+    (function(){
+      var p=document.createElement('div'), s=Math.random()*6+3;
+      p.style.cssText='position:fixed;z-index:9;left:'+(r.left+r.width/2)+'px;top:'+(r.top+r.height/2)+
+        'px;width:'+s+'px;height:'+s+'px;border-radius:50%;pointer-events:none;background:'+col+
+        ';box-shadow:0 0 12px '+col+';';
+      document.body.appendChild(p);
+      var a=Math.random()*6.283, d=Math.random()*190+60;
+      if(p.animate){
+        p.animate([{transform:'translate(0,0) scale(1)',opacity:1},
+                   {transform:'translate('+Math.cos(a)*d+'px,'+Math.sin(a)*d+'px) scale(0)',opacity:0}],
+                  {duration:700+Math.random()*400,easing:'cubic-bezier(.2,.8,.3,1)'}).onfinish=function(){p.remove();};
+      }else setTimeout(function(){p.remove();},800);
+    })();
+  }
+}
+
+/* =================== ท้องฟ้าดาว =================== */
+var sky=$('sky'), sc=sky.getContext('2d');
+var layers=[],bigStars=[],shoots=[],W=0,H=0,DPR=Math.min(window.devicePixelRatio||1,2);
+
+function buildSky(){
+  W=innerWidth; H=innerHeight;
+  sky.width=W*DPR; sky.height=H*DPR; sky.style.width=W+'px'; sky.style.height=H+'px';
+  sc.setTransform(DPR,0,0,DPR,0,0);
+  var area=W*H;
+  var cfg=[{n:area/5200,sp:.045,r:[.3,.9],a:.55},
+           {n:area/9000,sp:.12,r:[.7,1.5],a:.8},
+           {n:area/18000,sp:.26,r:[1.2,2.3],a:1}];
+  layers=cfg.map(function(c){
+    var arr=[],n=Math.min(Math.floor(c.n),320);
+    for(var i=0;i<n;i++) arr.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:c.r[0]+Math.random()*(c.r[1]-c.r[0]),
+      t:Math.random()*6.28,tw:.012+Math.random()*.03,sp:c.sp,a:c.a,
+      c:(Math.random()<.18?'183,155,255':(Math.random()<.4?'139,233,255':'255,255,255'))
+    });
+    return arr;
+  });
+  bigStars=[];
+  for(var j=0;j<14;j++) bigStars.push({
+    x:Math.random()*W,y:Math.random()*H*.85,r:2+Math.random()*2,
+    t:Math.random()*6.28,tw:.02+Math.random()*.02,
+    c:(Math.random()<.5?'139,233,255':'255,106,213')
+  });
+}
+addEventListener('resize',buildSky); buildSky();
+
+setInterval(function(){
+  if(Math.random()<.8) shoots.push({x:Math.random()*W*.9,y:Math.random()*H*.5,
+    len:100+Math.random()*180,sp:7+Math.random()*7,a:1});
+},1500);
+
+function flare(x,y,r,alpha,col){
+  sc.save(); sc.globalAlpha=alpha;
+  var g=sc.createRadialGradient(x,y,0,x,y,r*7);
+  g.addColorStop(0,'rgba('+col+',1)'); g.addColorStop(1,'rgba('+col+',0)');
+  sc.fillStyle=g; sc.beginPath(); sc.arc(x,y,r*7,0,6.283); sc.fill();
+  sc.strokeStyle='rgba('+col+','+(alpha*.9)+')'; sc.lineWidth=1;
+  sc.beginPath(); sc.moveTo(x-r*5,y); sc.lineTo(x+r*5,y);
+  sc.moveTo(x,y-r*5); sc.lineTo(x,y+r*5); sc.stroke();
+  sc.restore();
+}
+
+function drawSky(){
+  sc.clearRect(0,0,W,H);
+  for(var L=0;L<layers.length;L++){
+    var arr=layers[L];
+    for(var i=0;i<arr.length;i++){
+      var s=arr[i]; s.t+=s.tw; s.y+=s.sp;
+      if(s.y>H+2){ s.y=-2; s.x=Math.random()*W; }
+      var tw=.4+Math.sin(s.t)*.6; if(tw<0) tw=0;
+      sc.globalAlpha=tw*s.a; sc.fillStyle='rgb('+s.c+')';
+      sc.beginPath(); sc.arc(s.x,s.y,s.r*(1+tw*.4),0,6.283); sc.fill();
+    }
+  }
+  sc.globalAlpha=1;
+  for(var b=0;b<bigStars.length;b++){
+    var B=bigStars[b]; B.t+=B.tw; B.y+=.05;
+    if(B.y>H+10){ B.y=-10; B.x=Math.random()*W; }
+    flare(B.x,B.y,B.r,.35+Math.abs(Math.sin(B.t))*.55,B.c);
+  }
+  for(var k=shoots.length-1;k>=0;k--){
+    var m=shoots[k];
+    var g=sc.createLinearGradient(m.x,m.y,m.x-m.len,m.y-m.len*.55);
+    g.addColorStop(0,'rgba(255,255,255,'+m.a+')');
+    g.addColorStop(.35,'rgba(139,233,255,'+(m.a*.55)+')');
+    g.addColorStop(1,'rgba(160,107,255,0)');
+    sc.strokeStyle=g; sc.lineWidth=2.2; sc.lineCap='round';
+    sc.beginPath(); sc.moveTo(m.x,m.y); sc.lineTo(m.x-m.len,m.y-m.len*.55); sc.stroke();
+    sc.globalAlpha=m.a; sc.fillStyle='#fff';
+    sc.beginPath(); sc.arc(m.x,m.y,1.8,0,6.283); sc.fill(); sc.globalAlpha=1;
+    m.x+=m.sp; m.y+=m.sp*.55; m.a-=.011;
+    if(m.a<=0||m.x>W+350) shoots.splice(k,1);
+  }
+  requestAnimationFrame(drawSky);
+}
+drawSky();
+
+/* =================== ฝุ่นดาว =================== */
+var dustC=$('dust'), dc=dustC.getContext('2d'), motes=[];
+function buildDust(){
+  dustC.width=innerWidth*DPR; dustC.height=innerHeight*DPR;
+  dustC.style.width=innerWidth+'px'; dustC.style.height=innerHeight+'px';
+  dc.setTransform(DPR,0,0,DPR,0,0);
+  motes=[];
+  var n=Math.min(70,Math.floor(innerWidth*innerHeight/22000));
+  for(var i=0;i<n;i++) motes.push({
+    x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    r:.6+Math.random()*1.8,vx:(Math.random()-.5)*.25,vy:-(.1+Math.random()*.35),t:Math.random()*6.28
+  });
+}
+addEventListener('resize',buildDust); buildDust();
+function drawDust(){
+  dc.clearRect(0,0,innerWidth,innerHeight);
+  for(var i=0;i<motes.length;i++){
+    var m=motes[i]; m.x+=m.vx; m.y+=m.vy; m.t+=.03;
+    if(m.y<-5){ m.y=innerHeight+5; m.x=Math.random()*innerWidth; }
+    if(m.x<-5) m.x=innerWidth+5;
+    if(m.x>innerWidth+5) m.x=-5;
+    dc.globalAlpha=.15+Math.abs(Math.sin(m.t))*.45;
+    dc.fillStyle='#cfe6ff';
+    dc.beginPath(); dc.arc(m.x,m.y,m.r,0,6.283); dc.fill();
+  }
+  dc.globalAlpha=1;
+  requestAnimationFrame(drawDust);
+}
+drawDust();
+
+setModeLabel();
+start();
+
+}catch(err){
+  var box=document.getElementById('err');
+  if(box){ box.style.display='block'; box.textContent='เกิดข้อผิดพลาด: '+(err&&err.message?err.message:err); }
+  console.error(err);
+}
+});
+</script>
+</body>
+</html>
